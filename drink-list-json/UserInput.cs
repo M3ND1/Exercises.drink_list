@@ -1,58 +1,63 @@
-﻿namespace drink_list_json
+﻿using drink_list_json.Models;
+using Newtonsoft.Json;
+using System;
+using System.Xml.Serialization;
+
+namespace drink_list_json
 {
     public class UserInput
     {
+        DrinkService drinkService = new DrinkService();
         public void MainMenu()
         {
-            bool closeApp = false;
-            while (!closeApp)
+            while (true)
             {
-                Console.WriteLine("Choose number from 0 to 3");
-                Console.WriteLine("0 - break");
-                Console.WriteLine("1 - Categories");
-                Console.WriteLine("2 - TODO(not working)");
-                Console.WriteLine("3 - TODO(not working)");
-                int n = GetNumber();
-                Console.Clear();
-                switch (n)
-                {
-                    case 0:
-                        closeApp = true;
-                        break;
-                    case 1:
-                        DrinkService.showCategories();
-                        Console.WriteLine("\nChoose category and see drinks!");
-                        string categ = Console.ReadLine();
-                        DrinkService.getCategories(categ);
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        break;
-                    default:
-                        Console.WriteLine("Provide number as shown below.\n");
-                        break;
-                };
+                drinkService.showCategories();
+                getCategories();
+                MainMenu();
             }
         }
-        static int GetNumber()
+        internal void getCategories()
         {
-            int sol = 99;
-            bool flag = false;
-            while (flag == false)
+            var categories = drinkService.showCategories();
+            Console.WriteLine("Choose name of category  \t (to exit type 0)");
+            string category = Console.ReadLine();
+            if (category == "0") Environment.Exit(0);
+
+            if (!categories.Any(x => x.strCategory == category))
             {
-                try
-                {
-                    sol = Convert.ToInt32(Console.ReadLine());
-                    flag = true;
-                }
-                catch (FormatException)
-                {
-                    Console.Clear();
-                    Console.WriteLine("You did not provide proper number.\n");
-                }
+                Console.WriteLine("Category does not exists");
+                Console.Write("Press any key to continue... ");
+                Console.ReadKey();
+                Console.Clear();
+                getCategories();
             }
-            return sol;
+            else
+            {
+                drinkService.getDrinkByCategory(category);
+                getDrinks(category);
+            }
+        }
+        internal void getDrinks(string category)
+        {
+            Console.WriteLine("Choose drink by Id to see more information \t (to exit type 0)");
+            string drink = Console.ReadLine();
+            if (drink == "0") Environment.Exit(0);
+            var drinkobjects = drinkService.getDrinkByCategory(category);
+            if(!drinkobjects.Any(x => x.idDrink == drink)) 
+            {
+                Console.WriteLine("Provide proper ID!");
+                Console.Write("Press any key to continue... ");
+                Console.ReadKey();
+                Console.Clear();
+                getDrinks(category);
+            } else
+            {
+                drinkService.getDrinkInformation(drink);
+                Console.Write("Your information about drink is above!");
+                Console.Write("\n To continue press any key...");
+                Console.ReadKey();
+            }
         }
     }
 }

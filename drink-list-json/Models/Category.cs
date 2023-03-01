@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace drink_list_json
+namespace drink_list_json.Models
 {
     public class Category
     {
